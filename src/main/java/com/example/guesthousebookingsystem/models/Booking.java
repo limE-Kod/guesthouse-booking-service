@@ -28,11 +28,9 @@ public class Booking {
     private LocalDate checkOut;
 
     @NotNull
-    @ManyToOne
-    private Customer customer;
+    private Long customerid;
 
     @NotNull
-    @ManyToOne
-    private Room room;
+    private Long roomid;
 
 }
