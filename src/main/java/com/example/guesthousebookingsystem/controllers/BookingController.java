@@ -3,7 +3,6 @@ package com.example.guesthousebookingsystem.controllers;
 import com.example.guesthousebookingsystem.dtos.BookingDTO;
 import com.example.guesthousebookingsystem.dtos.RoomDTO;
 import com.example.guesthousebookingsystem.services.BookingService;
-import com.example.guesthousebookingsystem.services.CustomerService;
 import com.example.guesthousebookingsystem.services.RoomService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
