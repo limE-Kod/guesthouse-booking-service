@@ -6,7 +6,6 @@ import com.example.guesthousebookingsystem.models.Booking;
 import com.example.guesthousebookingsystem.models.Customer;
 import com.example.guesthousebookingsystem.models.Room;
 import com.example.guesthousebookingsystem.repositories.BookingRepository;
-import com.example.guesthousebookingsystem.repositories.CustomerRepository;
 import com.example.guesthousebookingsystem.repositories.RoomRepository;
 import com.example.guesthousebookingsystem.services.BookingService;
 import org.springframework.stereotype.Service;
