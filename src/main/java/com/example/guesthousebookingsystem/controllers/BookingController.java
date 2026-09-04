@@ -19,12 +19,11 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final RoomService roomService;
-    private final CustomerService customerService;
 
-    public BookingController(BookingService bookingService, RoomService roomService, CustomerService customerService) {
+    public BookingController(BookingService bookingService, RoomService roomService) {
         this.bookingService = bookingService;
         this.roomService = roomService;
-        this.customerService = customerService;
+
     }
 
 
@@ -37,7 +36,6 @@ public class BookingController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("booking", new BookingDTO());
-        model.addAttribute("customers", customerService.getAllCustomers());
         return "bookings/form";
     }
 
@@ -49,7 +47,6 @@ public class BookingController {
             Model model) {
         List<RoomDTO> availableRooms = bookingService.getAvailableRooms(checkIn, checkOut, numberOfPeople);
         model.addAttribute("booking", new BookingDTO());
-        model.addAttribute("customers", customerService.getAllCustomers());
         model.addAttribute("availableRooms", availableRooms);
         model.addAttribute("checkIn", checkIn);
         model.addAttribute("checkOut", checkOut);
@@ -71,7 +68,6 @@ public class BookingController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         model.addAttribute("booking", bookingService.getById(id));
-        model.addAttribute("customers", customerService.getAllCustomers());
         model.addAttribute("rooms", roomService.getAllRooms());
         return "bookings/form";
     }

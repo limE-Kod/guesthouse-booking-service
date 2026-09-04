@@ -10,11 +10,12 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    boolean existsByCustomerId(Long customerId);
 
+    @Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END FROM Booking b WHERE b.customerid = :customerId")
+    boolean existsByCustomerId(@Param("customerId") Long customerId);
 
-    @Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END FROM Booking b " +
-            "WHERE b.room.id = :roomId " +
+    @Query("SELECT CASE WHEN COUNT(b) > 0 then TRUE else FALSE end from Booking b " +
+            "WHERE b.roomid = :roomId " +
             "AND b.checkIn < :checkOut " +
             "AND b.checkOut > :checkIn " +
             "AND (:bookingId IS NULL OR b.id != :bookingId)")
@@ -24,7 +25,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                      @Param("bookingId") Long bookingId);
 
 
-    @Query("SELECT b.room.id FROM Booking b WHERE b.checkIn < :checkOut AND b.checkOut > :checkIn")
+    @Query("SELECT b.roomid FROM Booking b WHERE b.checkIn < :checkOut AND b.checkOut > :checkIn")
     List<Long> findBookedRoomIds(@Param("checkIn") LocalDate checkIn,
                                  @Param("checkOut") LocalDate checkOut);
 }
