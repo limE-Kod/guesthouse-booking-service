@@ -34,3 +34,5 @@ public class Booking {
     private Long roomid;
 
 }
+
+//GitHub-accesstest
