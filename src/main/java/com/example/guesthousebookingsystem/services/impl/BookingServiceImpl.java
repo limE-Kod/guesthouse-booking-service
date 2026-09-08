@@ -43,6 +43,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void save(BookingDTO bookingDTO) {
+        boolean customerExists;
+        try {
+            customerExists = customerServiceClient.customerExists(bookingDTO.getCustomerId());
+        } catch (CustomerServiceUnavailableException e) {
+            throw new RuntimeException("Customer is not verified - Customer Service dosent respond");
+        }
+
+        if (!customerExists) {
+            throw new RuntimeException("Customer couldnt be found");
+        }
+
 
         boolean conflict = bookingRepository.existsConflictingBooking(
                 bookingDTO.getRoomId(),
@@ -55,7 +66,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
 
-        Room room = roomRepository.findById(bookingDTO.getRoomId()).orElseThrow();
+        Room room = roomRepository.findById(bookingDTO.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
 
 
         Booking booking = new Booking();
