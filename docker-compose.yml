@@ -9,7 +9,7 @@ services:
     ports:
       - "3306:3306"
 
-  customer-service:
+  booking-service:
     build: .
     ports:
       - "8081:8081"
