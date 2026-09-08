@@ -1,6 +1,7 @@
 package com.example.guesthousebookingsystem.controllers;
 
 import com.example.guesthousebookingsystem.dtos.BookingDTO;
+import com.example.guesthousebookingsystem.dtos.CustomerDTO;
 import com.example.guesthousebookingsystem.dtos.RoomDTO;
 import com.example.guesthousebookingsystem.services.BookingService;
 import com.example.guesthousebookingsystem.services.RoomService;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.example.guesthousebookingsystem.dtos.CustomerDto;
+import com.example.guesthousebookingsystem.dtos.CustomerDTO;
 import com.example.guesthousebookingsystem.services.CustomerServiceClient;
 import com.example.guesthousebookingsystem.services.CustomerServiceUnavailableException;
 
@@ -91,7 +92,7 @@ public class BookingController {
         }
         return "redirect:/bookings";
     }
-    private List<CustomerDto> getCustomersOrEmpty(Model model) {
+    private List<CustomerDTO> getCustomersOrEmpty(Model model) {
         try {
             return customerServiceClient.getAllCustomers();
         } catch (CustomerServiceUnavailableException e) {

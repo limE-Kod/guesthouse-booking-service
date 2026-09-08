@@ -1,6 +1,6 @@
 package com.example.guesthousebookingsystem.services;
 
-import com.example.guesthousebookingsystem.dtos.CustomerDto;
+import com.example.guesthousebookingsystem.dtos.CustomerDTO;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -18,11 +18,11 @@ public class CustomerServiceClient {
         this.restClient = customerRestClient;
     }
 
-    public List<CustomerDto> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         try {
             return restClient.get()
                     .retrieve()
-                    .body(new ParameterizedTypeReference<List<CustomerDto>>() {});
+                    .body(new ParameterizedTypeReference<List<CustomerDTO>>() {});
         } catch (ResourceAccessException e) {
             throw new CustomerServiceUnavailableException("Kundtjänsten är inte tillgänglig just nu", e);
         }
