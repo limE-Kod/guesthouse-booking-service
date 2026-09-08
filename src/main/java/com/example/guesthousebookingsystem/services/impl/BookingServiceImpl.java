@@ -8,6 +8,8 @@ import com.example.guesthousebookingsystem.repositories.BookingRepository;
 import com.example.guesthousebookingsystem.repositories.RoomRepository;
 import com.example.guesthousebookingsystem.services.BookingService;
 import org.springframework.stereotype.Service;
+import com.example.guesthousebookingsystem.services.CustomerServiceClient;
+import com.example.guesthousebookingsystem.services.CustomerServiceUnavailableException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,12 +19,14 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final RoomRepository roomRepository;
+    private final CustomerServiceClient customerServiceClient;
 
 
     public BookingServiceImpl(BookingRepository bookingRepository,
-                              RoomRepository roomRepository) {
+                              RoomRepository roomRepository, CustomerServiceClient customerServiceClient) {
         this.bookingRepository = bookingRepository;
         this.roomRepository = roomRepository;
+        this.customerServiceClient = customerServiceClient;
     }
 
     @Override
@@ -43,6 +47,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void save(BookingDTO bookingDTO) {
+        boolean customerExists;
+        try {
+            customerExists = customerServiceClient.customerExists(bookingDTO.getCustomerId());
+        } catch (CustomerServiceUnavailableException e) {
+            throw new RuntimeException("Customer is not verified - Customer Service dosent respond");
+        }
+
+        if (!customerExists) {
+            throw new RuntimeException("Customer couldnt be found");
+        }
+
 
         boolean conflict = bookingRepository.existsConflictingBooking(
                 bookingDTO.getRoomId(),
@@ -55,7 +70,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
 
-        Room room = roomRepository.findById(bookingDTO.getRoomId()).orElseThrow();
+        Room room = roomRepository.findById(bookingDTO.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
 
 
         Booking booking = new Booking();

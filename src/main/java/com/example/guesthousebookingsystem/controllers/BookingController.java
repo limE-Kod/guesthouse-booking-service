@@ -1,6 +1,7 @@
 package com.example.guesthousebookingsystem.controllers;
 
 import com.example.guesthousebookingsystem.dtos.BookingDTO;
+import com.example.guesthousebookingsystem.dtos.CustomerDTO;
 import com.example.guesthousebookingsystem.dtos.RoomDTO;
 import com.example.guesthousebookingsystem.services.BookingService;
 import com.example.guesthousebookingsystem.services.RoomService;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.example.guesthousebookingsystem.dtos.CustomerDTO;
+import com.example.guesthousebookingsystem.services.CustomerServiceClient;
+import com.example.guesthousebookingsystem.services.CustomerServiceUnavailableException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,10 +23,13 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final RoomService roomService;
+    private final CustomerServiceClient customerServiceClient;
 
-    public BookingController(BookingService bookingService, RoomService roomService) {
+    public BookingController(BookingService bookingService, RoomService roomService,
+                             CustomerServiceClient customerServiceClient) {
         this.bookingService = bookingService;
         this.roomService = roomService;
+        this.customerServiceClient = customerServiceClient;
 
     }
 
@@ -36,6 +43,7 @@ public class BookingController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("booking", new BookingDTO());
+        model.addAttribute("customers", getCustomersOrEmpty(model));
         return "bookings/form";
     }
 
@@ -50,6 +58,7 @@ public class BookingController {
         model.addAttribute("availableRooms", availableRooms);
         model.addAttribute("checkIn", checkIn);
         model.addAttribute("checkOut", checkOut);
+        model.addAttribute("customers", getCustomersOrEmpty(model));
         return "bookings/form";
     }
 
@@ -59,7 +68,7 @@ public class BookingController {
             bookingService.save(bookingDTO);
             redirectAttributes.addFlashAttribute("successMessage", "Bokningen sparades!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Rummet är inte tillgängligt för valda datum!");
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/bookings";
     }
@@ -69,6 +78,7 @@ public class BookingController {
     public String showEditForm(@PathVariable Long id, Model model) {
         model.addAttribute("booking", bookingService.getById(id));
         model.addAttribute("rooms", roomService.getAllRooms());
+        model.addAttribute("customers", getCustomersOrEmpty(model));
         return "bookings/form";
     }
 
@@ -82,4 +92,13 @@ public class BookingController {
         }
         return "redirect:/bookings";
     }
+    private List<CustomerDTO> getCustomersOrEmpty(Model model) {
+        try {
+            return customerServiceClient.getAllCustomers();
+        } catch (CustomerServiceUnavailableException e) {
+            model.addAttribute("customerServiceWarning", "Kundtjänsten är inte tillgänglig just nu, kundlistan kunde inte hämtas.");
+            return List.of();
+        }
+    }
+
 }
