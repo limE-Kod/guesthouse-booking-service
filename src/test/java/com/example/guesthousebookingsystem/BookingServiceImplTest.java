@@ -3,7 +3,6 @@ package com.example.guesthousebookingsystem;
 import com.example.guesthousebookingsystem.dtos.BookingDTO;
 import com.example.guesthousebookingsystem.dtos.RoomDTO;
 import com.example.guesthousebookingsystem.models.Booking;
-import com.example.guesthousebookingsystem.models.Customer;
 import com.example.guesthousebookingsystem.models.Room;
 import com.example.guesthousebookingsystem.models.RoomType;
 import com.example.guesthousebookingsystem.repositories.BookingRepository;
@@ -27,8 +26,7 @@ public class BookingServiceImplTest {
 
     @Mock
     BookingRepository bookingRepository;
-    @Mock
-    CustomerRepository customerRepository;
+
     @Mock
     RoomRepository roomRepository;
 
@@ -37,8 +35,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getAllBookings_shouldReturnListOfBookingDTOs() {
-        Customer customer = new Customer("Anna");
-        customer.setId(1L);
+
+
         Room room = new Room("101");
         room.setId(1L);
 
@@ -46,8 +44,8 @@ public class BookingServiceImplTest {
         booking.setId(1L);
         booking.setCheckIn(LocalDate.of(2026, 6, 1));
         booking.setCheckOut(LocalDate.of(2026, 6, 5));
-        booking.setCustomer(customer);
-        booking.setRoom(room);
+        booking.setCustomerid(1L);
+        booking.setRoomid(room.getId());
 
         when(bookingRepository.findAll()).thenReturn(List.of(booking));
 
@@ -60,8 +58,7 @@ public class BookingServiceImplTest {
 
     @Test
     void getById_shouldReturnCorrectBookingDTO() {
-        Customer customer = new Customer("Anna");
-        customer.setId(1L);
+
         Room room = new Room("101");
         room.setId(1L);
 
@@ -69,8 +66,8 @@ public class BookingServiceImplTest {
         booking.setId(1L);
         booking.setCheckIn(LocalDate.of(2026, 6, 1));
         booking.setCheckOut(LocalDate.of(2026, 6, 5));
-        booking.setCustomer(customer);
-        booking.setRoom(room);
+        booking.setCustomerid(1L);
+        booking.setRoomid(room.getId());
 
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
 
@@ -103,13 +100,12 @@ public class BookingServiceImplTest {
                 LocalDate.of(2026, 6, 5),
                 1L, 1L);
 
-        Customer customer = new Customer("Anna");
-        customer.setId(1L);
+
         Room room = new Room("101");
         room.setId(1L);
 
         when(bookingRepository.existsConflictingBooking(any(), any(), any(), any())).thenReturn(false);
-        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
 
         bookingService.save(bookingDTO);
