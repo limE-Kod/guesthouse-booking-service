@@ -3,7 +3,6 @@ package com.example.guesthousebookingsystem.services.impl;
 import com.example.guesthousebookingsystem.dtos.BookingDTO;
 import com.example.guesthousebookingsystem.dtos.RoomDTO;
 import com.example.guesthousebookingsystem.models.Booking;
-import com.example.guesthousebookingsystem.models.Customer;
 import com.example.guesthousebookingsystem.models.Room;
 import com.example.guesthousebookingsystem.repositories.BookingRepository;
 import com.example.guesthousebookingsystem.repositories.RoomRepository;
@@ -17,15 +16,12 @@ import java.util.List;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
-    private final CustomerRepository customerRepository;
     private final RoomRepository roomRepository;
 
 
     public BookingServiceImpl(BookingRepository bookingRepository,
-                              CustomerRepository customerRepository,
                               RoomRepository roomRepository) {
         this.bookingRepository = bookingRepository;
-        this.customerRepository = customerRepository;
         this.roomRepository = roomRepository;
     }
 
@@ -34,7 +30,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findAll()
                 .stream()
                 .map(b -> new BookingDTO(b.getId(), b.getCheckIn(), b.getCheckOut(),
-                        b.getCustomer().getId(), b.getRoom().getId()))
+                        b.getCustomerid(), b.getRoomid()))
                 .toList();
     }
 
@@ -42,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDTO getById(Long id) {
         Booking booking = bookingRepository.findById(id).orElseThrow();
         return new BookingDTO(booking.getId(), booking.getCheckIn(), booking.getCheckOut(),
-                booking.getCustomer().getId(), booking.getRoom().getId());
+                booking.getCustomerid(), booking.getRoomid());
     }
 
     @Override
@@ -59,7 +55,6 @@ public class BookingServiceImpl implements BookingService {
         }
 
 
-        Customer customer = customerRepository.findById(bookingDTO.getCustomerId()).orElseThrow();
         Room room = roomRepository.findById(bookingDTO.getRoomId()).orElseThrow();
 
 
@@ -67,8 +62,8 @@ public class BookingServiceImpl implements BookingService {
         booking.setId(bookingDTO.getId());
         booking.setCheckIn(bookingDTO.getCheckIn());
         booking.setCheckOut(bookingDTO.getCheckOut());
-        booking.setCustomer(customer);
-        booking.setRoom(room);
+        booking.setCustomerid(bookingDTO.getCustomerId());
+        booking.setRoomid(room.getId());
 
         bookingRepository.save(booking);
     }
@@ -88,4 +83,4 @@ public class BookingServiceImpl implements BookingService {
                 .map(r -> new RoomDTO(r.getName(), r.getId(), r.getRoomType(), r.getExtraBeds(), r.getMaxCapacity()))
                 .toList();
     }
-    }
+}
