@@ -1,5 +1,5 @@
 package com.example.guesthousebookingsystem;
-
+import com.example.guesthousebookingsystem.services.CustomerServiceClient;
 import com.example.guesthousebookingsystem.dtos.BookingDTO;
 import com.example.guesthousebookingsystem.dtos.RoomDTO;
 import com.example.guesthousebookingsystem.models.Booking;
@@ -29,6 +29,9 @@ public class BookingServiceImplTest {
 
     @Mock
     RoomRepository roomRepository;
+
+    @Mock
+    CustomerServiceClient customerServiceClient;
 
     @InjectMocks
     BookingServiceImpl bookingService;
@@ -84,7 +87,7 @@ public class BookingServiceImplTest {
                 LocalDate.of(2026, 6, 1),
                 LocalDate.of(2026, 6, 5),
                 1L, 1L);
-
+        when(customerServiceClient.customerExists(any())).thenReturn(true);
         when(bookingRepository.existsConflictingBooking(1L,
                 LocalDate.of(2026, 6, 1),
                 LocalDate.of(2026, 6, 5),
@@ -99,6 +102,7 @@ public class BookingServiceImplTest {
                 LocalDate.of(2026, 6, 1),
                 LocalDate.of(2026, 6, 5),
                 1L, 1L);
+        when(customerServiceClient.customerExists(any())).thenReturn(true);
 
 
         Room room = new Room("101");
