@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   booking-db:
     image: mysql:8
@@ -8,6 +6,12 @@ services:
       MYSQL_DATABASE: bookingdb
     ports:
       - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot",
+             "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   booking-service:
     build: .
@@ -17,5 +21,34 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://booking-db:3306/bookingdb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+      CUSTOMER_SERVICE_BASE_URL: http://customer-service:8080/api/customers
     depends_on:
-      - booking-db
+     booking-db:
+      condition: service_healthy
+
+  customer-db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: customerdb
+    ports:
+      - "3308:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot",
+             "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  customer-service:
+    build: ../guesthouse-customer-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://customer-db:3306/customerdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      BOOKING_SERVICE_BASE_URL: http://booking-service:8081
+    depends_on:
+      customer-db:
+        condition: service_healthy
