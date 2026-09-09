@@ -112,6 +112,14 @@ public class BookingServiceImplTest {
 
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
 
+        Booking savedBooking = new Booking();
+        savedBooking.setId(1L);
+        savedBooking.setCheckIn(LocalDate.of(2026, 6, 1));
+        savedBooking.setCheckOut(LocalDate.of(2026, 6, 5));
+        savedBooking.setCustomerid(1L);
+        savedBooking.setRoomid(1L);
+        when(bookingRepository.save(any(Booking.class))).thenReturn(savedBooking);
+
         bookingService.save(bookingDTO);
 
         verify(bookingRepository).save(any(Booking.class));
