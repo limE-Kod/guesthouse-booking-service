@@ -6,10 +6,8 @@ import com.example.guesthousebookingsystem.models.Booking;
 import com.example.guesthousebookingsystem.models.Room;
 import com.example.guesthousebookingsystem.repositories.BookingRepository;
 import com.example.guesthousebookingsystem.repositories.RoomRepository;
-import com.example.guesthousebookingsystem.services.BookingService;
+import com.example.guesthousebookingsystem.services.*;
 import org.springframework.stereotype.Service;
-import com.example.guesthousebookingsystem.services.CustomerServiceClient;
-import com.example.guesthousebookingsystem.services.CustomerServiceUnavailableException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -46,18 +44,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void save(BookingDTO bookingDTO) {
-        boolean customerExists;
-        try {
-            customerExists = customerServiceClient.customerExists(bookingDTO.getCustomerId());
-        } catch (CustomerServiceUnavailableException e) {
-            throw new RuntimeException("Customer is not verified - Customer Service dosent respond");
-        }
+    public boolean hasActiveBookings(Long customerId) {
+        return bookingRepository.existsByCustomerId(customerId);
+    }
 
-        if (!customerExists) {
-            throw new RuntimeException("Customer couldnt be found");
+    @Override
+    public BookingDTO save(BookingDTO bookingDTO) {
+        if (!customerServiceClient.customerExists(bookingDTO.getCustomerId())) {
+            throw new CustomerNotFoundException(
+                    "Customer " + bookingDTO.getCustomerId() + " does not exist");
         }
-
 
         boolean conflict = bookingRepository.existsConflictingBooking(
                 bookingDTO.getRoomId(),
@@ -66,13 +62,10 @@ public class BookingServiceImpl implements BookingService {
                 bookingDTO.getId()
         );
         if (conflict) {
-            throw new RuntimeException("Room is not available for the selected dates");
+            throw new BookingConflictException("Room is not available for the selected dates");
         }
 
-
-        Room room = roomRepository.findById(bookingDTO.getRoomId())
-                .orElseThrow(() -> new RuntimeException("Room not found"));
-
+        Room room = roomRepository.findById(bookingDTO.getRoomId()).orElseThrow();
 
         Booking booking = new Booking();
         booking.setId(bookingDTO.getId());
@@ -81,7 +74,9 @@ public class BookingServiceImpl implements BookingService {
         booking.setCustomerid(bookingDTO.getCustomerId());
         booking.setRoomid(room.getId());
 
-        bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        return new BookingDTO(saved.getId(), saved.getCheckIn(), saved.getCheckOut(),
+                saved.getCustomerid(), saved.getRoomid());
     }
 
     @Override
